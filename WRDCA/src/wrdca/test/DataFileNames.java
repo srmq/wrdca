@@ -19,7 +19,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 public class DataFileNames {
-	private static final String BUNDLE_NAME = "crdsnda.test.datafilenames"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME = "wrdca.test.datafilenames"; //$NON-NLS-1$
 
 	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
 			.getBundle(BUNDLE_NAME);

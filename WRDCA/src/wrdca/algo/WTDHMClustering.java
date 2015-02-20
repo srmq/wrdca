@@ -64,6 +64,21 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	
 	private SeedingType seedType = SeedingType.RANDOM_SEED;
 	
+	private static IloCplex cplex; 
+	
+	static {
+		try {
+			cplex = new IloCplex();
+			if (!DEBUG) {
+				cplex.setOut(null);
+			}
+			cplex.setParam(IloCplex.DoubleParam.TiLim, TIMELIMIT);
+		} catch (IloException ex) {
+			ex.printStackTrace();
+			throw new IllegalStateException("ERROR INITIALIZING CPLEX: " + ex.getMessage());
+		}
+	}
+	
 	// pesos para cada cluster k
 	//private float[][] relevanceMatrix;
 	private List<Cluster> clusters;
@@ -169,11 +184,7 @@ public class WTDHMClustering implements ClusterAlgorithm {
 
 	private double updateWeights(Cluster cluster, double maxValue) throws IloException {
 		double regret = -1;
-		IloCplex cplex = new IloCplex();
-		if (!DEBUG) {
-			cplex.setOut(null);
-		}
-		cplex.setParam(IloCplex.DoubleParam.TiLim, TIMELIMIT);
+		
 		IloNumVar[] pVars = new IloNumVar[cluster.getElements().size()];
 		for (int i = 0; i < pVars.length; i++) {
 			pVars[i] = cplex.numVar(0.0, BIG_CONSTANT);
@@ -221,7 +232,8 @@ public class WTDHMClustering implements ClusterAlgorithm {
 				}
 			}
 		}
-		cplex.end(); 
+		cplex.clearModel();
+		
 		return regret;
 	}
 
