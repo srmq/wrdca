@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class SimpleTextInputFileNormalizer {
@@ -25,7 +27,7 @@ public class SimpleTextInputFileNormalizer {
 		}
 		BufferedReader buf = new BufferedReader(new FileReader(inputFile));
 		for (int i = 0; i < n; i++) {
-			System.out.println(buf.readLine());
+			buf.readLine();
 		}
 		DissimMatrix dissimMatrix = new DissimMatrix(n);
 		for (int i = 0; i < n; i++) {
@@ -36,16 +38,47 @@ public class SimpleTextInputFileNormalizer {
 				dissimMatrix.putDissim(i, j, dissim);
 			}
 		}
+		buf.close();
+		Set<Integer> incomparables = flagIncomparable(dissimMatrix);
 		dispersionNormalize(dissimMatrix);
+		printObjects(dissimMatrix, inputFile, n, incomparables);
 		for (int i = 0; i < n; i++) {
-			System.out.print(dissimMatrix.getDissim(i, 0));
+			if (!incomparables.contains(i)) System.out.print(dissimMatrix.getDissim(i, 0));
+			else continue;
 			for(int j = 1; j <= i; j++) {
-				System.out.print("," + dissimMatrix.getDissim(i, j));
+				if (!incomparables.contains(j)) System.out.print("," + dissimMatrix.getDissim(i, j));
 			}
 			System.out.println("");
 		}
 		
+	}
+
+	private static void printObjects(DissimMatrix dissimMatrix, File inputFile, int nObjects, Set<Integer> incomparables) throws IOException {
+		BufferedReader buf = new BufferedReader(new FileReader(inputFile));
+		for (int i = 0; i < nObjects; i++) {
+			final String line = buf.readLine();
+			if (!incomparables.contains(i)) {
+				System.out.println(line);
+			}
+		}
 		buf.close();
+	}
+
+	private static Set<Integer> flagIncomparable(DissimMatrix dissimMatrix) {
+		Set<Integer> result = new HashSet<Integer>();
+		final int n = dissimMatrix.length();
+		for (int i = 0; i < n; i++) {
+			int negative = 0;
+			for(int j = 0; j < n; j++) {
+				if (i != j && dissimMatrix.getDissim(i, j) < 0) {
+					negative++;
+				}
+			}
+			if (negative == (n - 1)) {
+				result.add(i);
+			}
+		}
+		return result;
 	}
 
 	private static void dispersionNormalize(DissimMatrix dissimMatrix) {

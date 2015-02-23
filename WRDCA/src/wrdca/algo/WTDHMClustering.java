@@ -34,7 +34,7 @@ import wrdca.util.DissimMatrix;
 
 public class WTDHMClustering implements ClusterAlgorithm {
 	private List<DissimMatrix> dissimMatrices;
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	private static final Random rnd = new Random(1);
 	
 	public static final double EPSILON = 0.000001;
@@ -50,6 +50,8 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	private double maxWeightAbsoluteDifferenceGlobal = 1.0;
 	
 	private int iteracoes;
+	
+	private int maxIterations = Integer.MAX_VALUE;
 	
 	public static enum SeedingType {
 		RANDOM_SEED, PLUSPLUS_SEED
@@ -83,7 +85,7 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	//private float[][] relevanceMatrix;
 	private List<Cluster> clusters;
 
-	public static final int BIG_CONSTANT = Integer.MAX_VALUE/100;
+	public static final int BIG_CONSTANT = Integer.MAX_VALUE/1000;
 	
 	public WTDHMClustering(List<DissimMatrix> dissimMatrices) {
 		this.dissimMatrices = dissimMatrices;
@@ -114,25 +116,27 @@ public class WTDHMClustering implements ClusterAlgorithm {
 				final double myJ = calcJ(clusters);
 				assert ((myJ <= _J) || (Math.abs(myJ - _J) < EPSILON));
 			}
-			for (int i = 0; i < clusters.size(); i++) {
+			if (this.dissimMatrices.size() > 1) {
+				for (int i = 0; i < clusters.size(); i++) {
+					if (DEBUG) {
+						System.out.println("Regret of Cluster " + i + " before update weights: " + calcJ(clusters.get(i)));
+					}
+					final double regret;
+					final double maxValue = calcJ(clusters.get(i));
+					regret = updateWeights(clusters.get(i), maxValue);
+					if (regret == -1) {
+						System.out.println("WARNING: Could not optimize weights for cluster " + i);
+					}
+					if (DEBUG) {
+						System.out.println("Regret of Cluster " + i + " AFTER update weights: " + regret);
+						System.out.println("And with calcJ this means: " + calcJ(clusters.get(i)));
+					}
+				}
 				if (DEBUG) {
-					System.out.println("Regret of Cluster " + i + " before update weights: " + calcJ(clusters.get(i)));
-				}
-				final double regret;
-				final double maxValue = calcJ(clusters.get(i));
-				regret = updateWeights(clusters.get(i), maxValue);
-				if (regret == -1) {
-					System.out.println("WARNING: Could not optimize weights for cluster " + i);
-				}
-				if (DEBUG) {
-					System.out.println("Regret of Cluster " + i + " AFTER update weights: " + regret);
-					System.out.println("And with calcJ this means: " + calcJ(clusters.get(i)));
-				}
+					final double myJ = calcJ(clusters);
+					assert ((myJ <= _J) || (Math.abs(myJ - _J) < EPSILON));
+				}			
 			}
-			if (DEBUG) {
-				final double myJ = calcJ(clusters);
-				assert ((myJ <= _J) || (Math.abs(myJ - _J) < EPSILON));
-			}			
 			changed = clusterAssign(clusters);
 			if (DEBUG) {
 				List<Cluster> newClusters = cloneClusters();
@@ -154,7 +158,7 @@ public class WTDHMClustering implements ClusterAlgorithm {
 				System.out.println("");
 			}
 
-		} while (changed && !this.timeLimitAchieved);
+		} while (changed && !this.timeLimitAchieved && (iteracoes < maxIterations));
 		if (DEBUG) {
 			System.out.println("------ FIM DE CALCULO -----");
 
@@ -411,10 +415,16 @@ public class WTDHMClustering implements ClusterAlgorithm {
 		double maxRegret = Double.MIN_VALUE;
 		double myRegret;
 		for (int c = 0; c < nCriteria; c++) {
-			myRegret = this.dissimMatrices.get(c).getDissim(i, j) * cluster.getWeights()[c];
+			final double dissim = this.dissimMatrices.get(c).getDissim(i, j);
+			if (dissim >= 0.0) {
+				myRegret =  dissim * cluster.getWeights()[c];
+			} else {
+				myRegret = BIG_CONSTANT;
+			}
 			if (myRegret > maxRegret) {
 				maxRegret = myRegret;
 			}
+
 		}
 		return maxRegret;
 	}
@@ -450,7 +460,9 @@ public class WTDHMClustering implements ClusterAlgorithm {
 		float sumRegret = 0.0f;
 		for (Iterator<Integer> iterator = c.getElements().iterator(); iterator.hasNext();) {
 			Integer el = iterator.next();
-			sumRegret += maxRegret(el, candidateCenter, c);
+			final double maxReg = maxRegret(el, candidateCenter, c); 
+			if (maxReg != BIG_CONSTANT) sumRegret += maxReg;
+			else return BIG_CONSTANT;
 			if (sumRegret > currentRegret) return BIG_CONSTANT;
 		}
 		return sumRegret;
@@ -527,6 +539,14 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	@Override
 	public int getIterationsToConverge() {
 		return this.iteracoes;
+	}
+
+	public int getMaxIterations() {
+		return maxIterations;
+	}
+
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
 	}
 
 }
