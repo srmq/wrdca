@@ -1,7 +1,5 @@
 package wrdca.test;
 
-import ilog.concert.IloException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,12 +12,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import wrdca.algo.ClusterAlgorithm;
 import wrdca.algo.WTDHMClustering;
+import wrdca.algo.WTDHMGlobalClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
 import wrdca.util.DissimMatrix;
 
-public class WTDHMLocalSimpleFormatRunner {
+public class WTDHMSimpleFormatRunner {
 	
 	private int k;
 	private int numInicializacao;
@@ -31,27 +31,48 @@ public class WTDHMLocalSimpleFormatRunner {
 	private List<DissimMatrix> dissimMatrices;
 	
 	
-	private WTDHMLocalSimpleFormatRunner() {
-		
+	private WTDHMSimpleFormatRunner(String[] args) throws FileNotFoundException, IOException {
+		this.readConfigFile(args);
+		this.parseDissimMatrices();
 	}
+	
+	public ClusterAlgorithm createLocalClusterAlgorithm(List<DissimMatrix> dissimMatrices) {
+		return new WTDHMClustering(dissimMatrices);
+	}
+	
+	public ClusterAlgorithm createGlobalClusterAlgorithm(List<DissimMatrix> dissimMatrices) {
+		return new WTDHMGlobalClustering(dissimMatrices);
+	}
+	
 
-	public static void main(String[] args) throws IOException, IloException {
-		if (args.length != 1) {
+	public static void main(String[] args) throws Exception {
+		if (args.length < 1) {
 			System.out.println("Should give name of config file as argument");
-		}
-		WTDHMLocalSimpleFormatRunner runner = new WTDHMLocalSimpleFormatRunner();
-		runner.readConfigFile(args);
-		runner.parseDissimMatrices();
-		int classlabels[] = runner.classLabelsForObjects();
-		
+		} //args = 2 significa global
+		WTDHMSimpleFormatRunner runner = new WTDHMSimpleFormatRunner(args);
+
+		int classlabels[] = runner.classLabelsForObjects();		
 		double bestJ = Double.MAX_VALUE;
-		double bestCR = 0;
 		List<Cluster> bestClusters = null;
 		final int iterationCount[] = new int[runner.numInicializacao];
 		long timeInMilis = System.currentTimeMillis();
+		PrintStream outStream;
+		if (runner.outputFile == null) {
+			outStream = System.out;
+		} else {
+			outStream = new PrintStream(runner.outputFile, "UTF-8");
+		}
+
 		for (int i = 0; i < runner.numInicializacao; i++) {
-			WTDHMClustering clust = new WTDHMClustering(runner.dissimMatrices);
+			ClusterAlgorithm clust;
+			if (args.length == 1) {
+				clust = runner.createLocalClusterAlgorithm(runner.dissimMatrices);
+			} else {
+				clust = runner.createGlobalClusterAlgorithm(runner.dissimMatrices);
+				outStream.println("RUNNING GLOBAL");
+			}
 			if (runner.numIteracoes > 0) clust.setMaxIterations(runner.numIteracoes);
+			//clust.setMaxWeightAbsoluteDifferenceGlobal(0.2);
 			clust.cluster(runner.k);
 			iterationCount[i] = clust.getIterationsToConverge();
 			final List<Cluster> myClusters = clust.getClusters();
@@ -59,7 +80,6 @@ public class WTDHMLocalSimpleFormatRunner {
 			if (myJ < bestJ) {
 				bestJ = myJ;
 				bestClusters = myClusters;
-				bestCR = clust.calcCR(classlabels);
 			}
 		}
 		timeInMilis = System.currentTimeMillis() - timeInMilis;
@@ -72,12 +92,6 @@ public class WTDHMLocalSimpleFormatRunner {
 			}
 		}
 		
-		PrintStream outStream;
-		if (runner.outputFile == null) {
-			outStream = System.out;
-		} else {
-			outStream = new PrintStream(runner.outputFile, "UTF-8");
-		}
 		outStream.println("------CONFUSION MATRIX-------");
 		confusionMatrix.printMatrix(outStream);
 		outStream.println("-----------------------------");
@@ -86,7 +100,7 @@ public class WTDHMLocalSimpleFormatRunner {
 			outStream.println(i + ": " + Arrays.toString(bestClusters.get(i).getWeights())); 
 		}
 		outStream.println(">>>>>>>>>>>> The F-Measure is: "+ confusionMatrix.fMeasureGlobal());
-		outStream.println(">>>>>>>>>>>> The CR-Index  is: "+ bestCR);
+		outStream.println(">>>>>>>>>>>> The CR-Index  is: "+ confusionMatrix.CRIndex());
 		outStream.println(">>>>>>>>>>>> OERC Index    is: " + confusionMatrix.OERCIndex());
 		outStream.println(">>>>>>>>>>>> NMI  Index    is: " + confusionMatrix.nMIIndex());;
 		outStream.println("Iterations to converge: " + Arrays.toString(iterationCount));

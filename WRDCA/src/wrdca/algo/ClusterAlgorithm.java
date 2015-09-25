@@ -25,4 +25,5 @@ public interface ClusterAlgorithm {
 	public double calcJ(List<Cluster> clusters);
 	public List<Cluster> getClusters();
 	public int getIterationsToConverge();
+	public void setMaxIterations(int maxIterations);
 }

@@ -56,6 +56,8 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 
 	
 	public static final int BIG_CONSTANT = Integer.MAX_VALUE/100;
+	
+	private int maxIterations = Integer.MAX_VALUE;
 
 
 	private List<Cluster> clusters;
@@ -150,7 +152,7 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 				currJ = J;
 				System.out.println(">>>>>>>>>> J: " + J);
 			}
-		} while (changed);
+		} while (changed && (iteracoes <= this.maxIterations));
 		if (DEBUG) {
 			System.out.println("------ FIM DE CALCULO -----");
 
@@ -442,6 +444,11 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	public int getIterationsToConverge() {
 		return this.iteracoes;
 	}
+	
+	public void setMaxIterations(int maxIterations) {
+		this.maxIterations = maxIterations;
+	}
+
 	
 	
 }

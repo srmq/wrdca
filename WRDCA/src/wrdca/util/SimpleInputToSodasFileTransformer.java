@@ -102,10 +102,10 @@ public class SimpleInputToSodasFileTransformer {
 		stream.println(" (1 ,nominal ,\"\" ,\"AF00\" ,\"Apriori Class\" , 0, 0 ," + classSet.size() + ", (");
 		{
 			Iterator<Integer> it = classSet.iterator();
-			int i = it.next();
+			int i = it.next() + 1; // categories are one based in sodas
 			stream.print("	(" + i +" ,\"CL" + i + "\" ,\"Class" + i + "\" ,0)");
 			while(it.hasNext()) {
-				i = it.next();
+				i = it.next() + 1;
 				stream.println(",");
 				stream.print("	(" + i +" ,\"CL" + i + "\" ,\"Class" + i + "\" ,0)");
 			}
@@ -118,11 +118,11 @@ public class SimpleInputToSodasFileTransformer {
 		stream.println("RECTANGLE_MATRIX = (");
 		Iterator<SimpleImmutableEntry<String, Integer>> it = objects.iterator();
 		SimpleImmutableEntry<String, Integer> element = it.next();
-		stream.print("(" + element.getValue() + ",( 0.0 : 0.0 ))");
+		stream.print("(" + (element.getValue()+1) + ",( 0.0 : 0.0 ))"); //one-based in SODAS
 		while (it.hasNext()) {
 			element = it.next();
 			stream.println(",");
-			stream.print("(" + element.getValue() + ",( 0.0 : 0.0 ))");
+			stream.print("(" + (element.getValue()+1) + ",( 0.0 : 0.0 ))");
 		}
 		stream.println("");
 		stream.println("),");
