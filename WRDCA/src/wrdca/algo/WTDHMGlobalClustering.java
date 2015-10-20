@@ -49,7 +49,7 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	
 	private static final Random rnd = new Random(1);
 	
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	
 	public static final double EPSILON = 0.000001;
@@ -125,21 +125,23 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 			}
 			List<Cluster> clusters = bestPrototypes();
 			final double maxValue = calcJ(clusters);
-			if (DEBUG) {
-				assert (maxValue <= _J)|| (Math.abs(maxValue - _J) < EPSILON);
-				System.out.println("J before updating weights is: " + maxValue);
+			if (this.dissimMatrices.size() > 1) {
+				if (DEBUG) {
+					assert (maxValue <= _J)|| (Math.abs(maxValue - _J) < EPSILON);
+					System.out.println("J before updating weights is: " + maxValue);
+				}
+	
+				final double regret = updateWeights(clusters, maxValue);
+				if (DEBUG) {
+					System.out.println("Regret of Clusters AFTER update weights: " + regret);
+					System.out.println("And wit calcJ this means: " + calcJ(clusters));
+				}
+	
+				if (DEBUG) {
+					final double myJ = calcJ(clusters);
+					assert ((myJ <= _J) || (Math.abs(myJ - _J) < EPSILON));
+				}
 			}
-
-			final double regret = updateWeights(clusters, maxValue);
-			if (DEBUG) {
-				System.out.println("Regret of Clusters AFTER update weights: " + regret);
-				System.out.println("And wit calcJ this means: " + calcJ(clusters));
-			}
-
-			if (DEBUG) {
-				final double myJ = calcJ(clusters);
-				assert ((myJ <= _J) || (Math.abs(myJ - _J) < EPSILON));
-			}			
 			changed = clusterAssign(clusters);
 			if (DEBUG) {
 				List<Cluster> newClusters = cloneClusters();
