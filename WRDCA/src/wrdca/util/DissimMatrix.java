@@ -15,6 +15,9 @@
  */
 package wrdca.util;
 
+import java.io.IOException;
+import java.io.Writer;
+
 public class DissimMatrix {
 	private double[][] matrix;
 	private int nElems;
@@ -56,5 +59,17 @@ public class DissimMatrix {
 	 */
 	public final int length() {
 		return this.nElems;
+	}
+	
+	public void printMatrix(Writer out) throws IOException {
+		for(int i = 0; i < nElems; i++) {
+			for(int j = 0; j < i; j++) {
+				out.write(Double.toString(this.matrix[i][j]));
+				out.write(',');
+			}
+			out.write(Double.toString(this.matrix[i][i]));
+			out.write(System.lineSeparator());
+		}
+		out.flush();
 	}
 }
