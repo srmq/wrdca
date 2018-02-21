@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class ThyroidDataset {
@@ -37,12 +37,12 @@ public class ThyroidDataset {
 	public static final int APRIORICLASSES = 3;
 	
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix tab2 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID2"));
-		DissimMatrix tab3 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID3"));
-		DissimMatrix tab4 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID4"));
-		DissimMatrix tab5 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID5"));
-		DissimMatrix tab6 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID6"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(5);
+		DissimMatrixDouble tab2 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID2"));
+		DissimMatrixDouble tab3 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID3"));
+		DissimMatrixDouble tab4 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID4"));
+		DissimMatrixDouble tab5 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID5"));
+		DissimMatrixDouble tab6 = parseFile(DataFileNames.getString("ThyroidDataset.THYROID6"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(5);
 		dissimMatrices.add(tab2);
 		dissimMatrices.add(tab3);
 		dissimMatrices.add(tab4);
@@ -88,10 +88,10 @@ public class ThyroidDataset {
 		
 	}
 	
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(NELEM);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEM);
 		String line;
 		while((line = bufw.readLine()).indexOf("DIST_MATRIX") == -1)
 			;

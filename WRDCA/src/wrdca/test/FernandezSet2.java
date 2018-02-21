@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMGlobalClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 import wrdca.util.MathUtil;
 
 
@@ -59,7 +59,7 @@ public class FernandezSet2 {
 		}
 		final String classNames[] = {"Very Low","Low","Low or Below Average","Below Average","Average","Average or Above Average","Above Average","Above Average or High","High","High or Very High","Very High","Exceptional"};
 		// TODO Auto-generated method stub
-		List<DissimMatrix> dissimMatrices = computeDissims(itens);
+		List<DissimMatrixDouble> dissimMatrices = computeDissims(itens);
 		final double iterationCount[] = new double[NUMBER_OF_RUNS];
 		for(int k = 1; k <= 25; k++) { /* inicialmente fiz de 1 ate 25 */
 			double bestJ = Double.MAX_VALUE;
@@ -234,10 +234,10 @@ public class FernandezSet2 {
 		return result;
 	}
 	
-	private static List<DissimMatrix> computeDissims(List<ClusterItem> itens) {
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(NUMBER_OF_CRITERIA);
+	private static List<DissimMatrixDouble> computeDissims(List<ClusterItem> itens) {
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(NUMBER_OF_CRITERIA);
 		for (int i = 0; i < NUMBER_OF_CRITERIA; i++) {
-			DissimMatrix dissimM = new DissimMatrix(itens.size());
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(itens.size());
 			for (int el = 0; el < itens.size(); el++) {
 				for (int j = 0; j <= el; j++) {
 					dissimM.putDissim(el, j, calcDissim(el, j, i, itens));

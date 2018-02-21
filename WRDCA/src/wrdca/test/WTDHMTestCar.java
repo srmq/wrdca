@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 
@@ -42,7 +42,7 @@ public class WTDHMTestCar {
 	public static void main(String[] args) throws IOException, IloException {
 		byte[][] objectDescription = objectDescription();
 		int[] classLabels = getClassLabels(objectDescription);
-		List<DissimMatrix> dissimMatrices = computeDissims(objectDescription);
+		List<DissimMatrixDouble> dissimMatrices = computeDissims(objectDescription);
 		
 		for(int k = 4; k <= 4; k++) { //fixme k = 1
 			double bestJ = Double.MAX_VALUE;
@@ -100,10 +100,10 @@ public class WTDHMTestCar {
 		return result;
 	}
 
-	private static List<DissimMatrix> computeDissims(byte[][] objectDescription) {
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(NUMBER_COLUMNS - 1);
+	private static List<DissimMatrixDouble> computeDissims(byte[][] objectDescription) {
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(NUMBER_COLUMNS - 1);
 		for (int i = 0; i < NUMBER_COLUMNS - 1; i++) {
-			DissimMatrix dissimM = new DissimMatrix(objectDescription.length);
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(objectDescription.length);
 			for (int el = 0; el < objectDescription.length; el++) {
 				for (int j = 0; j <= el; j++) {
 					dissimM.putDissim(el, j, calcDissim(el, j, i, objectDescription));

@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.ClusterAlgorithm;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class PollMarriageTest {
@@ -85,7 +85,7 @@ public class PollMarriageTest {
 	 */
 	public static void main(String[] args)  throws Exception {
 		GroupObject[] objects = parseFile(DataFileNames.getString("PollMarriageTest.DATAFILE")); //$NON-NLS-1$
-		List<DissimMatrix> dissimMatrices = computeDissims(objects);
+		List<DissimMatrixDouble> dissimMatrices = computeDissims(objects);
 		final int iterationCount[] = new int[NUMBER_OF_RUNS];
 
 		for(int k = 1; k <= 10; k++) {
@@ -135,11 +135,11 @@ public class PollMarriageTest {
 		
 	}
 	
-	private static List<DissimMatrix> computeDissims(GroupObject[] objects) {
+	private static List<DissimMatrixDouble> computeDissims(GroupObject[] objects) {
 		final int numberOfQuestions = objects[0].numberOfQuestions();
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(numberOfQuestions);
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(numberOfQuestions);
 		for (int i = 0; i < numberOfQuestions; i++) {
-			DissimMatrix dissimM = new DissimMatrix(objects.length);
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(objects.length);
 			for (int el = 0; el < objects.length; el++) {
 				for (int j = 0; j <= el; j++) {
 				 dissimM.putDissim(el, j, calcDissim(el, j, i, objects));

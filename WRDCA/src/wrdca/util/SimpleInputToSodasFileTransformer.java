@@ -43,7 +43,7 @@ public class SimpleInputToSodasFileTransformer {
 			AbstractMap.SimpleImmutableEntry<String, Integer> entry = new AbstractMap.SimpleImmutableEntry<String, Integer>(objectId, classVar);
 			objects.add(entry);
 		}
-		DissimMatrix dissimMatrix = new DissimMatrix(n);
+		DissimMatrixDouble dissimMatrix = new DissimMatrixDouble(n);
 		for (int i = 0; i < n; i++) {
 			final String line = buf.readLine();
 			final StringTokenizer strtok = new StringTokenizer(line, ",");
@@ -59,7 +59,7 @@ public class SimpleInputToSodasFileTransformer {
 
 	private static void printSodas(
 			List<SimpleImmutableEntry<String, Integer>> objects,
-			DissimMatrix dissimMatrix, SortedSet<Integer> classSet, PrintStream stream) {
+			DissimMatrixDouble dissimMatrix, SortedSet<Integer> classSet, PrintStream stream) {
 
 		stream.println("SODAS = (");
 		stream.println("		CONTAINS = (");

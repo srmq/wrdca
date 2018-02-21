@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class FernandezSet1Test {
@@ -39,7 +40,7 @@ public class FernandezSet1Test {
 	 */
 	public static void main(String[] args) throws IOException, IloException {
 		List<ClusterItem> itens = parseFile(DataFileNames.getString("FernandezSet1Test.DATAFILE")); //$NON-NLS-1$);
-		List<DissimMatrix> dissimMatrices = computeDissims(itens);
+		List<DissimMatrixDouble> dissimMatrices = computeDissims(itens);
 		
 		for(int k = 1; k <= 10; k++) {
 			double bestJ = Double.MAX_VALUE;
@@ -74,10 +75,10 @@ public class FernandezSet1Test {
 		
 	}
 	
-	private static List<DissimMatrix> computeDissims(List<ClusterItem> itens) {
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(NUMBER_OF_CRITERIA);
+	private static List<DissimMatrixDouble> computeDissims(List<ClusterItem> itens) {
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(NUMBER_OF_CRITERIA);
 		for (int i = 0; i < NUMBER_OF_CRITERIA; i++) {
-			DissimMatrix dissimM = new DissimMatrix(itens.size());
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(itens.size());
 
 			for (int el = 0; el < itens.size(); el++) {
 				for (int j = 0; j <= el; j++) {

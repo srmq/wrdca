@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class ToyDataset1 {
@@ -42,9 +42,9 @@ public class ToyDataset1 {
 	public static final int NELEMS = 110;
 	
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix l1 = parseFile(DataFileNames.getString("ToyDataset1.TOY1")); //$NON-NLS-1$
-		DissimMatrix l2 = parseFile(DataFileNames.getString("ToyDataset1.TOY2")); //$NON-NLS-1$
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(2);
+		DissimMatrixDouble l1 = parseFile(DataFileNames.getString("ToyDataset1.TOY1")); //$NON-NLS-1$
+		DissimMatrixDouble l2 = parseFile(DataFileNames.getString("ToyDataset1.TOY2")); //$NON-NLS-1$
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(2);
 		dissimMatrices.add(l1);
 		dissimMatrices.add(l2);
 
@@ -98,10 +98,10 @@ public class ToyDataset1 {
 		System.out.println("Total time in seconds: " + timeInMilis/1000.0);
 	}
 	
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(NELEMS);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEMS);
 		for (int i = 0; i < NELEMS; i++) {
 			String line = bufw.readLine();
 			StringTokenizer sttok = new StringTokenizer(line, ",", false); //$NON-NLS-1$

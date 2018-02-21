@@ -8,8 +8,12 @@ import java.util.Locale;
 import java.util.Scanner;
 
 public class MMDissimMatrixReader {
-
+	
 	public static DissimMatrix readMM(File mtxFile) throws IOException {
+		return readMM(mtxFile, false);
+	}
+
+	public static DissimMatrix readMM(File mtxFile, boolean useFloats) throws IOException {
 		Scanner scan = null;
 		BufferedReader bufw = null;
 		try {
@@ -28,7 +32,7 @@ public class MMDissimMatrixReader {
 			}
 			int nonZeros = scan.nextInt();
 			int readN = 0;
-			final DissimMatrix result = new DissimMatrix(lines);
+			final DissimMatrix result = (useFloats) ? new DissimMatrixFloat(lines) : new DissimMatrixDouble(lines);
 			while(scan.hasNextInt()) {
 				int i = scan.nextInt(); i--;
 				int j = scan.nextInt(); j--;

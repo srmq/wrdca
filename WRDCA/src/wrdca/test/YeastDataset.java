@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class YeastDataset {
@@ -37,13 +37,13 @@ public class YeastDataset {
 	public static final int APRIORICLASSES = 10;
 
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix tab1 = parseFile(DataFileNames.getString("YeastDataset.YEAST1"));
-		DissimMatrix tab2 = parseFile(DataFileNames.getString("YeastDataset.YEAST2"));
-		DissimMatrix tab3 = parseFile(DataFileNames.getString("YeastDataset.YEAST3"));
-		DissimMatrix tab4 = parseFile(DataFileNames.getString("YeastDataset.YEAST4"));
-		DissimMatrix tab5 = parseFile(DataFileNames.getString("YeastDataset.YEAST5"));
-		DissimMatrix tab6 = parseFile(DataFileNames.getString("YeastDataset.YEAST6"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(6);
+		DissimMatrixDouble tab1 = parseFile(DataFileNames.getString("YeastDataset.YEAST1"));
+		DissimMatrixDouble tab2 = parseFile(DataFileNames.getString("YeastDataset.YEAST2"));
+		DissimMatrixDouble tab3 = parseFile(DataFileNames.getString("YeastDataset.YEAST3"));
+		DissimMatrixDouble tab4 = parseFile(DataFileNames.getString("YeastDataset.YEAST4"));
+		DissimMatrixDouble tab5 = parseFile(DataFileNames.getString("YeastDataset.YEAST5"));
+		DissimMatrixDouble tab6 = parseFile(DataFileNames.getString("YeastDataset.YEAST6"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(6);
 		dissimMatrices.add(tab1);
 		dissimMatrices.add(tab2);
 		dissimMatrices.add(tab3);
@@ -97,10 +97,10 @@ public class YeastDataset {
 		
 	}
 	
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(NELEM);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEM);
 		String line;
 		while((line = bufw.readLine()).indexOf("DIST_MATRIX") == -1)
 			;

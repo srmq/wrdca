@@ -30,7 +30,7 @@ import java.util.zip.GZIPInputStream;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class WTDHMTestImageDatabase {
@@ -40,12 +40,12 @@ public class WTDHMTestImageDatabase {
 	
 	public static void main(String[] args)  throws IOException, IloException {
 		WTDHMTestImageDatabase test = new WTDHMTestImageDatabase();
-		DissimMatrix tab1 = test.parseFile(DataFileNames.getString("ImageDataset.DESC"));
-		DissimMatrix tab2 = test.parseFile(DataFileNames.getString("ImageDataset.COL_HST"));
-		DissimMatrix tab3 = test.parseFile(DataFileNames.getString("ImageDataset.COL_POS"));
-		DissimMatrix tab4 = test.parseFile(DataFileNames.getString("ImageDataset.GABOR_HST"));
-		DissimMatrix tab5 = test.parseFile(DataFileNames.getString("ImageDataset.GABOR_POS"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(5);
+		DissimMatrixDouble tab1 = test.parseFile(DataFileNames.getString("ImageDataset.DESC"));
+		DissimMatrixDouble tab2 = test.parseFile(DataFileNames.getString("ImageDataset.COL_HST"));
+		DissimMatrixDouble tab3 = test.parseFile(DataFileNames.getString("ImageDataset.COL_POS"));
+		DissimMatrixDouble tab4 = test.parseFile(DataFileNames.getString("ImageDataset.GABOR_HST"));
+		DissimMatrixDouble tab5 = test.parseFile(DataFileNames.getString("ImageDataset.GABOR_POS"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(5);
 		dissimMatrices.add(tab1);
 		dissimMatrices.add(tab2);
 		dissimMatrices.add(tab3);
@@ -86,7 +86,7 @@ public class WTDHMTestImageDatabase {
 		System.out.println(">>>>>>>>>>>> NMI  Index    is: " + confusionMatrix.nMIIndex());;
 	}
 	
-	private DissimMatrix parseFile(String string) throws IOException {
+	private DissimMatrixDouble parseFile(String string) throws IOException {
 		final File file = new File(string);
 		final BufferedReader bufw = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
 		String line;
@@ -101,7 +101,7 @@ public class WTDHMTestImageDatabase {
 				this.clusterNum[i] = Integer.parseInt(line);
 			}
 		}
-		DissimMatrix result = new DissimMatrix(NELEM);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEM);
 		for (int i = 0; i < NELEM; i++) {
 			line = bufw.readLine();
 			StringTokenizer tokenizer = new StringTokenizer(line, ", \t\n\r\f");

@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMGlobalClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class FernandezSet2CrossValidation1x81 {
@@ -63,7 +63,7 @@ public class FernandezSet2CrossValidation1x81 {
 		}
 		final String classNames[] = {"Very Low","Low","Low or Below Average","Below Average","Average","Average or Above Average","Above Average","Above Average or High","High","High or Very High","Very High","Exceptional"};
 		// TODO Auto-generated method stub
-		List<DissimMatrix> allObjectsDissimMatrices = computeDissims(allItens);
+		List<DissimMatrixDouble> allObjectsDissimMatrices = computeDissims(allItens);
 		
 		List<ClusterItem> objectsToCluster = new ArrayList<ClusterItem>(NUMBER_OF_OBJECTS - CROSS_VALIDATION_PARTITION_CARDINALITY);
 		assert (CROSS_VALIDATION_PARTITION_CARDINALITY * CROSS_VALIDATION_PARTITIONS == NUMBER_OF_OBJECTS);
@@ -106,7 +106,7 @@ public class FernandezSet2CrossValidation1x81 {
 
 				List<Cluster> bestClusters = null;
 				long timeInMilis = System.currentTimeMillis();
-				List<DissimMatrix> clusterObjectsDissimMatrices = computeDissims(objectsToCluster);
+				List<DissimMatrixDouble> clusterObjectsDissimMatrices = computeDissims(objectsToCluster);
 				for (int i = 0; i < NUMBER_OF_RUNS; i++) {
 					WTDHMGlobalClustering clust = new WTDHMGlobalClustering(clusterObjectsDissimMatrices);
 					//WTDHMClustering clust = new WTDHMClustering(dissimMatrices);
@@ -241,10 +241,10 @@ public class FernandezSet2CrossValidation1x81 {
 		return result;
 	}
 	
-	private static List<DissimMatrix> computeDissims(List<ClusterItem> itens) {
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(NUMBER_OF_CRITERIA);
+	private static List<DissimMatrixDouble> computeDissims(List<ClusterItem> itens) {
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(NUMBER_OF_CRITERIA);
 		for (int i = 0; i < NUMBER_OF_CRITERIA; i++) {
-			DissimMatrix dissimM = new DissimMatrix(itens.size());
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(itens.size());
 			for (int el = 0; el < itens.size(); el++) {
 				for (int j = 0; j <= el; j++) {
 					dissimM.putDissim(el, j, calcDissim(el, j, i, itens));
@@ -257,7 +257,7 @@ public class FernandezSet2CrossValidation1x81 {
 		return result;
 	}
 	
-	private final static double maxRegret(int elTestSet, int clusterCenterAllObjects, Cluster cluster, List<DissimMatrix> dissimMatricesAllObjects) {
+	private final static double maxRegret(int elTestSet, int clusterCenterAllObjects, Cluster cluster, List<DissimMatrixDouble> dissimMatricesAllObjects) {
 		double maxRegret = Double.MIN_VALUE;
 		double myRegret;
 		int dimensions = cluster.getWeights().length;

@@ -29,16 +29,16 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 
 public class WTDHMTestPhoneme {
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix l1 = parseFile(DataFileNames.getString("PhonemeDataset.ACC"));
-		DissimMatrix l2 = parseFile(DataFileNames.getString("PhonemeDataset.PHO"));
-		DissimMatrix l3 = parseFile(DataFileNames.getString("PhonemeDataset.VEL"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(3);
+		DissimMatrixDouble l1 = parseFile(DataFileNames.getString("PhonemeDataset.ACC"));
+		DissimMatrixDouble l2 = parseFile(DataFileNames.getString("PhonemeDataset.PHO"));
+		DissimMatrixDouble l3 = parseFile(DataFileNames.getString("PhonemeDataset.VEL"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(3);
 		dissimMatrices.add(l1);
 		dissimMatrices.add(l2);
 		dissimMatrices.add(l3);
@@ -101,10 +101,10 @@ public class WTDHMTestPhoneme {
 		
 	}
 
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(2000);
+		DissimMatrixDouble result = new DissimMatrixDouble(2000);
 		for (int i = 0; i < 2000; i++) {
 			String line = bufw.readLine();
 			StringTokenizer sttok = new StringTokenizer(line, ",", false);

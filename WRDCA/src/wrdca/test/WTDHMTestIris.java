@@ -29,17 +29,17 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 
 public class WTDHMTestIris {
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix l1 = parseFile(DataFileNames.getString("WTDHMTestIris.L1_DATAFILE")); //$NON-NLS-1$
-		DissimMatrix l2 = parseFile(DataFileNames.getString("WTDHMTestIris.L2_DATAFILE")); //$NON-NLS-1$
-		DissimMatrix l3 = parseFile(DataFileNames.getString("WTDHMTestIris.L3_DATAFILE")); //$NON-NLS-1$
-		DissimMatrix l4 = parseFile(DataFileNames.getString("WTDHMTestIris.L4_DATAFILE")); //$NON-NLS-1$
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(4);
+		DissimMatrixDouble l1 = parseFile(DataFileNames.getString("WTDHMTestIris.L1_DATAFILE")); //$NON-NLS-1$
+		DissimMatrixDouble l2 = parseFile(DataFileNames.getString("WTDHMTestIris.L2_DATAFILE")); //$NON-NLS-1$
+		DissimMatrixDouble l3 = parseFile(DataFileNames.getString("WTDHMTestIris.L3_DATAFILE")); //$NON-NLS-1$
+		DissimMatrixDouble l4 = parseFile(DataFileNames.getString("WTDHMTestIris.L4_DATAFILE")); //$NON-NLS-1$
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(4);
 		dissimMatrices.add(l1);
 		dissimMatrices.add(l2);
 		dissimMatrices.add(l3);
@@ -104,10 +104,10 @@ public class WTDHMTestIris {
 
 	}
 
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(150);
+		DissimMatrixDouble result = new DissimMatrixDouble(150);
 		for (int i = 0; i < 150; i++) {
 			String line = bufw.readLine();
 			StringTokenizer sttok = new StringTokenizer(line, ",", false); //$NON-NLS-1$

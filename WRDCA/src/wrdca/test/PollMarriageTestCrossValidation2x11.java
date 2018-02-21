@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.ClusterAlgorithm;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class PollMarriageTestCrossValidation2x11 {
@@ -94,7 +94,7 @@ public class PollMarriageTestCrossValidation2x11 {
 				- CROSS_VALIDATION_PARTITION_CARDINALITY];
 
 		int objectsToClusterObjectMapping[] = new int[objectsToCluster.length];
-		List<DissimMatrix> dissimMatricesAllObjects = computeDissims(objects);
+		List<DissimMatrixDouble> dissimMatricesAllObjects = computeDissims(objects);
 
 		System.out.println("K,AVG_SUM_J");
 		for (int k = 1; k <= 10; k++) {
@@ -124,7 +124,7 @@ public class PollMarriageTestCrossValidation2x11 {
 					testSet[destIndex++] = objects[sourceIndex++];
 				}
 
-				List<DissimMatrix> dissimMatricesToCluster = computeDissims(objectsToCluster);
+				List<DissimMatrixDouble> dissimMatricesToCluster = computeDissims(objectsToCluster);
 				final int iterationCount[] = new int[NUMBER_OF_RUNS];
 
 				double bestJ = Double.MAX_VALUE;
@@ -166,7 +166,7 @@ public class PollMarriageTestCrossValidation2x11 {
 
 	}
 	
-	private final static double maxRegret(int elTestSet, int clusterCenterAllObjects, Cluster cluster, List<DissimMatrix> dissimMatricesAllObjects) {
+	private final static double maxRegret(int elTestSet, int clusterCenterAllObjects, Cluster cluster, List<DissimMatrixDouble> dissimMatricesAllObjects) {
 		double maxRegret = Double.MIN_VALUE;
 		double myRegret;
 		int dimensions = cluster.getWeights().length;
@@ -180,11 +180,11 @@ public class PollMarriageTestCrossValidation2x11 {
 	}
 
 	
-	private static List<DissimMatrix> computeDissims(GroupObject[] objects) {
+	private static List<DissimMatrixDouble> computeDissims(GroupObject[] objects) {
 		final int numberOfQuestions = objects[0].numberOfQuestions();
-		List<DissimMatrix> result = new ArrayList<DissimMatrix>(numberOfQuestions);
+		List<DissimMatrixDouble> result = new ArrayList<DissimMatrixDouble>(numberOfQuestions);
 		for (int i = 0; i < numberOfQuestions; i++) {
-			DissimMatrix dissimM = new DissimMatrix(objects.length);
+			DissimMatrixDouble dissimM = new DissimMatrixDouble(objects.length);
 			for (int el = 0; el < objects.length; el++) {
 				for (int j = 0; j <= el; j++) {
 				 dissimM.putDissim(el, j, calcDissim(el, j, i, objects));

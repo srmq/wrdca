@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class MultipleFeatureDataset {
@@ -40,13 +40,13 @@ public class MultipleFeatureDataset {
 	 * @throws IloException 
 	 */
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix dissimFac = parseFile(DataFileNames.getString("MultipleFeatureDataset.FACMATRIX"));
-		DissimMatrix dissimFou = parseFile(DataFileNames.getString("MultipleFeatureDataset.FOUMATRIX"));
-		DissimMatrix dissimKar = parseFile(DataFileNames.getString("MultipleFeatureDataset.KARMATRIX"));
-		DissimMatrix dissimMor = parseFile(DataFileNames.getString("MultipleFeatureDataset.MORMATRIX"));
-		DissimMatrix dissimPix = parseFile(DataFileNames.getString("MultipleFeatureDataset.PIXMATRIX"));
-		DissimMatrix dissimZer = parseFile(DataFileNames.getString("MultipleFeatureDataset.ZERMATRIX"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(6);
+		DissimMatrixDouble dissimFac = parseFile(DataFileNames.getString("MultipleFeatureDataset.FACMATRIX"));
+		DissimMatrixDouble dissimFou = parseFile(DataFileNames.getString("MultipleFeatureDataset.FOUMATRIX"));
+		DissimMatrixDouble dissimKar = parseFile(DataFileNames.getString("MultipleFeatureDataset.KARMATRIX"));
+		DissimMatrixDouble dissimMor = parseFile(DataFileNames.getString("MultipleFeatureDataset.MORMATRIX"));
+		DissimMatrixDouble dissimPix = parseFile(DataFileNames.getString("MultipleFeatureDataset.PIXMATRIX"));
+		DissimMatrixDouble dissimZer = parseFile(DataFileNames.getString("MultipleFeatureDataset.ZERMATRIX"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(6);
 		dissimMatrices.add(dissimFac);
 		dissimMatrices.add(dissimFou);
 		dissimMatrices.add(dissimKar);
@@ -90,10 +90,10 @@ public class MultipleFeatureDataset {
 
 	}
 
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(NELEM);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEM);
 		String line;
 		while((line = bufw.readLine()).indexOf("DIST_MATRIX") == -1)
 			;

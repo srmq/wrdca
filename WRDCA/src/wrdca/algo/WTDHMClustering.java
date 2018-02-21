@@ -15,12 +15,6 @@
  */
 package wrdca.algo;
 
-import ilog.concert.IloException;
-import ilog.concert.IloIntVar;
-import ilog.concert.IloNumExpr;
-import ilog.concert.IloNumVar;
-import ilog.cplex.IloCplex;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,12 +22,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import ilog.concert.IloException;
+import ilog.concert.IloIntVar;
+import ilog.concert.IloNumExpr;
+import ilog.concert.IloNumVar;
+import ilog.cplex.IloCplex;
 import wrdca.util.Cluster;
 import wrdca.util.DissimMatrix;
 
 
 public class WTDHMClustering implements ClusterAlgorithm {
-	private List<DissimMatrix> dissimMatrices;
+	private List<? extends DissimMatrix> dissimMatrices;
 	public static final boolean DEBUG = true;
 	private static final Random rnd = new Random(1);
 	
@@ -87,7 +86,7 @@ public class WTDHMClustering implements ClusterAlgorithm {
 
 	public static final int BIG_CONSTANT = Integer.MAX_VALUE/1000;
 	
-	public WTDHMClustering(List<DissimMatrix> dissimMatrices) {
+	public WTDHMClustering(List<? extends DissimMatrix> dissimMatrices) {
 		this.dissimMatrices = dissimMatrices;
 		this.nElems = dissimMatrices.get(0).length();
 		this.nCriteria = dissimMatrices.size();
@@ -429,6 +428,18 @@ public class WTDHMClustering implements ClusterAlgorithm {
 		return maxRegret;
 	}
 	
+	public double[] regretsForElement(int i, List<Cluster> clusters) {
+		double[] res = new double[clusters.size()];
+		{
+			int ci=0;
+			for (Iterator<Cluster> it = clusters.iterator(); it.hasNext(); ci++) {
+				final Cluster clust = it.next();
+				res[ci] = maxRegret(i, clust.getCenter(), clust);
+			}
+		}
+		return res;
+	}
+	
 	private List<Cluster> bestPrototypes() {
 		//List<Cluster> clusterList = genClusters();
 		float[] minSumRegrets = new float[this.clusters.size()];
@@ -536,7 +547,6 @@ public class WTDHMClustering implements ClusterAlgorithm {
 		return ((System.currentTimeMillis() - this.initTimeMilis)/1000L) > TOTALTIMELIMITSECONDS;
 	}
 
-	@Override
 	public int getIterationsToConverge() {
 		return this.iteracoes;
 	}

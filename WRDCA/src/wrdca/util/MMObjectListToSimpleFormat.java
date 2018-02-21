@@ -8,8 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class MMObjectListToSimpleFormat {
-	public static void genSimpleFormatFile(File mmFile, File objectList, File outputSimpleFormat) throws IOException {
-		DissimMatrix dissim = MMDissimMatrixReader.readMM(mmFile);
+	public static void genSimpleFormatFile(File mmFile, File objectList, File outputSimpleFormat, boolean useFloats) throws IOException {
+		DissimMatrix dissim = MMDissimMatrixReader.readMM(mmFile, useFloats);
 		BufferedWriter bufw = new BufferedWriter(new FileWriter(outputSimpleFormat));
 		
 		BufferedReader read = new BufferedReader(new FileReader(objectList));
@@ -31,6 +31,8 @@ public class MMObjectListToSimpleFormat {
 		
 		////e.g. "/home/srmq/git/nlp/srmq-nlp/experiments/20newsgroups-sample10-lsa50Dissim.txt"
 		File outputFile = new File(args[2]);
-		genSimpleFormatFile(mmFile, objectList, outputFile);
+		boolean useFloats = false;
+		if (args.length == 4) useFloats = true;
+		genSimpleFormatFile(mmFile, objectList, outputFile, useFloats);
 	}
 }

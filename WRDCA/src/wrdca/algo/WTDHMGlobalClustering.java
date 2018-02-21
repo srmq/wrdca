@@ -15,12 +15,6 @@
  */
 package wrdca.algo;
 
-import ilog.concert.IloException;
-import ilog.concert.IloIntVar;
-import ilog.concert.IloNumExpr;
-import ilog.concert.IloNumVar;
-import ilog.cplex.IloCplex;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,12 +22,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import ilog.concert.IloException;
+import ilog.concert.IloIntVar;
+import ilog.concert.IloNumExpr;
+import ilog.concert.IloNumVar;
+import ilog.cplex.IloCplex;
 import wrdca.util.Cluster;
 import wrdca.util.DissimMatrix;
 
 
 public class WTDHMGlobalClustering implements ClusterAlgorithm {
-	private List<DissimMatrix> dissimMatrices;
+	private List<? extends DissimMatrix> dissimMatrices;
 	private final int nElems;
 	private final int nCriteria;
 	
@@ -63,7 +62,7 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	private List<Cluster> clusters;
 	private int[] indexInClustersForElem;
 
-	public WTDHMGlobalClustering(List<DissimMatrix> dissimMatrices) {
+	public WTDHMGlobalClustering(List<? extends DissimMatrix> dissimMatrices) {
 		this.dissimMatrices = dissimMatrices;
 		this.nElems = dissimMatrices.get(0).length();
 		this.nCriteria = dissimMatrices.size();
@@ -442,7 +441,6 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 
 	}
 
-	@Override
 	public int getIterationsToConverge() {
 		return this.iteracoes;
 	}
@@ -451,6 +449,17 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 		this.maxIterations = maxIterations;
 	}
 
+	public double[] regretsForElement(int i, List<Cluster> clusters) {
+		double[] res = new double[clusters.size()];
+		{
+			int ci=0;
+			for (Iterator<Cluster> it = clusters.iterator(); it.hasNext(); ci++) {
+				final Cluster clust = it.next();
+				res[ci] = maxRegret(i, clust.getCenter(), clust);
+			}
+		}
+		return res;
+	}
 	
 	
 }

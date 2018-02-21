@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import wrdca.algo.ClusterAlgorithm;
@@ -18,6 +21,8 @@ import wrdca.algo.WTDHMGlobalClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
 import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
+import wrdca.util.Pair;
 
 public class WTDHMSimpleFormatRunner {
 	
@@ -28,7 +33,7 @@ public class WTDHMSimpleFormatRunner {
 	private File outputFile;
 	private int n;
 	private int numPrioriClusters;
-	private List<DissimMatrix> dissimMatrices;
+	private List<DissimMatrixDouble> dissimMatrices;
 	
 	
 	private WTDHMSimpleFormatRunner(String[] args) throws FileNotFoundException, IOException {
@@ -36,11 +41,11 @@ public class WTDHMSimpleFormatRunner {
 		this.parseDissimMatrices();
 	}
 	
-	public ClusterAlgorithm createLocalClusterAlgorithm(List<DissimMatrix> dissimMatrices) {
+	public ClusterAlgorithm createLocalClusterAlgorithm(List<? extends DissimMatrix> dissimMatrices) {
 		return new WTDHMClustering(dissimMatrices);
 	}
 	
-	public ClusterAlgorithm createGlobalClusterAlgorithm(List<DissimMatrix> dissimMatrices) {
+	public ClusterAlgorithm createGlobalClusterAlgorithm(List<DissimMatrixDouble> dissimMatrices) {
 		return new WTDHMGlobalClustering(dissimMatrices);
 	}
 	
@@ -51,7 +56,9 @@ public class WTDHMSimpleFormatRunner {
 		} //args = 2 significa global
 		WTDHMSimpleFormatRunner runner = new WTDHMSimpleFormatRunner(args);
 
-		int classlabels[] = runner.classLabelsForObjects();		
+		final Pair<int[], String[]> classLabelsObjectNames = runner.classLabelsForObjects();
+		final int classlabels[] = classLabelsObjectNames.getFirst();
+		final String[] objectNames = classLabelsObjectNames.getSecond();
 		double bestJ = Double.MAX_VALUE;
 		List<Cluster> bestClusters = null;
 		final int iterationCount[] = new int[runner.numInicializacao];
@@ -63,8 +70,8 @@ public class WTDHMSimpleFormatRunner {
 			outStream = new PrintStream(runner.outputFile, "UTF-8");
 		}
 
+		ClusterAlgorithm clust=null;
 		for (int i = 0; i < runner.numInicializacao; i++) {
-			ClusterAlgorithm clust;
 			if (args.length == 1) {
 				clust = runner.createLocalClusterAlgorithm(runner.dissimMatrices);
 			} else {
@@ -84,12 +91,23 @@ public class WTDHMSimpleFormatRunner {
 		}
 		timeInMilis = System.currentTimeMillis() - timeInMilis;
 		ConfusionMatrix confusionMatrix = new ConfusionMatrix(runner.k, runner.numPrioriClusters);
+		outStream.println("------CLUSTER CONTENTS-------");
 		for (int i = 0; i < bestClusters.size(); i++) {
 			Cluster cluster = bestClusters.get(i);
+			outStream.println("Cluster " + i);
+			outStream.println("Center: " + objectNames[cluster.getCenter()]);
+			outStream.println("-- BEGIN MEMBERS --");
 			for (Integer element : cluster.getElements()) {
 				final int classlabel = classlabels[element];
 				confusionMatrix.putObject(element, i, classlabel);
+				outStream.print(objectNames[element]);
+				final int align = 40 - objectNames[element].length();
+				for (int c = 0; c < Math.max(align, 1); c++)
+					outStream.print(' ');
+				double[] regrets = clust.regretsForElement(element, bestClusters);
+				outStream.println(Arrays.toString(regrets));
 			}
+			outStream.println("-- END MEMBERS --");			
 		}
 		
 		outStream.println("------CONFUSION MATRIX-------");
@@ -99,6 +117,7 @@ public class WTDHMSimpleFormatRunner {
 		for (int i = 0; i < bestClusters.size(); i++) {
 			outStream.println(i + ": " + Arrays.toString(bestClusters.get(i).getWeights())); 
 		}
+		outStream.println(">>>>>>>>>>>> Best J is: "+ bestJ);
 		outStream.println(">>>>>>>>>>>> The F-Measure is: "+ confusionMatrix.fMeasureGlobal());
 		outStream.println(">>>>>>>>>>>> The CR-Index  is: "+ confusionMatrix.CRIndex());
 		outStream.println(">>>>>>>>>>>> OERC Index    is: " + confusionMatrix.OERCIndex());
@@ -115,34 +134,89 @@ public class WTDHMSimpleFormatRunner {
 		System.exit(0);
 	}
 
-	private int[] classLabelsForObjects() throws IOException{
+	private Pair<int[], String[]> classLabelsForObjects() throws IOException{
 		BufferedReader buf = new BufferedReader(new FileReader(this.inputFiles.get(0)));
 		int[] classLabels = new int[this.n];
+		String[] names = new String[this.n];
 		for (int i = 0; i < n; i++) {
 			final String line = buf.readLine();
 			final StringTokenizer strtok = new StringTokenizer(line, ",");
 			classLabels[i] = Integer.parseInt(strtok.nextToken());
+			names[i] = strtok.nextToken();
 		}
 
 		buf.close();
-		return classLabels;
+		return new Pair<int[], String[]>(classLabels, names);
 	}
 
 	private void parseDissimMatrices() throws IOException{
-		 this.dissimMatrices = new ArrayList<DissimMatrix>(this.inputFiles.size());
+		 this.dissimMatrices = new ArrayList<DissimMatrixDouble>(this.inputFiles.size());
+		 boolean firstFile = true;
+		 Map<String, Integer> refOrder = null;
+		 List<String> refNames = null;
 		 for (File file : inputFiles) {
-			DissimMatrix dissim = parseDissimMatrix(file);
+			Pair<DissimMatrixDouble, List<String>> parseResult = parseDissimMatrix(file);
+			DissimMatrixDouble dissim = parseResult.getFirst();
+			if (firstFile) {
+				refNames = parseResult.getSecond();
+				refOrder = new HashMap<String, Integer>(refNames.size());
+				int i = 0;
+				for (String refName : refNames) {
+					refOrder.put(refName, i);
+					i++;
+				}
+				firstFile = false;
+			} else {
+				assert(refOrder != null);
+				assert(refNames != null);
+				if (!parseResult.getSecond().equals(refNames)) {
+					dissim = reorderedDissim(refOrder, parseResult.getSecond(), dissim);
+				}
+			}
 			this.dissimMatrices.add(dissim);
 		}
 	}
 
 
-	private DissimMatrix parseDissimMatrix(File file) throws IOException {
-		BufferedReader buf = new BufferedReader(new FileReader(file));
-		for (int i = 0; i < n; i++) {
-			buf.readLine();
+	private DissimMatrixDouble reorderedDissim(final Map<String, Integer> refOrder, List<String> second, DissimMatrixDouble dissim) {
+		List<Pair<String, Integer>> names = new ArrayList<Pair<String, Integer>>(second.size());
+		{
+			int i = 0;
+			for (String name : second) {
+				names.add(new Pair<String, Integer>(name, i));
+				i++;
+			}
 		}
-		DissimMatrix dissimMatrix = new DissimMatrix(n);
+		names.sort(new Comparator<Pair<String, Integer>>() {
+
+			public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
+				assert(refOrder.containsKey(o1.getFirst()));
+				assert(refOrder.containsKey(o2.getFirst()));
+				return refOrder.get(o1.getFirst()) - refOrder.get(o2.getFirst());
+			}
+			
+		});
+		DissimMatrixDouble dissimMatrix = new DissimMatrixDouble(n);
+		for (int i = 0; i < n; i++) {
+			int trI = names.get(i).getSecond();
+			for (int j = 0; j <= i; j++) {
+				int trJ = names.get(j).getSecond();
+				dissimMatrix.putDissim(i, j, dissim.getDissim(trI, trJ));
+			}
+		}
+		
+		return dissimMatrix;
+	}
+
+	private Pair<DissimMatrixDouble, List<String>> parseDissimMatrix(File file) throws IOException {
+		BufferedReader buf = new BufferedReader(new FileReader(file));
+		List<String> objNames = new ArrayList<String>(n);
+		for (int i = 0; i < n; i++) {
+			String line = buf.readLine();
+			line = line.substring(line.indexOf(',')+1);
+			objNames.add(line);
+		}
+		DissimMatrixDouble dissimMatrix = new DissimMatrixDouble(n);
 		for (int i = 0; i < n; i++) {
 			final String line = buf.readLine();
 			final StringTokenizer strtok = new StringTokenizer(line, ",");
@@ -152,7 +226,7 @@ public class WTDHMSimpleFormatRunner {
 			}
 		}
 		buf.close();
-		return dissimMatrix;
+		return new Pair<DissimMatrixDouble, List<String>>(dissimMatrix, objNames);
 	}
 
 	private void readConfigFile(String[] args)

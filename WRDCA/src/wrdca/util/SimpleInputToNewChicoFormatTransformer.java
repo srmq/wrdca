@@ -70,7 +70,7 @@ public class SimpleInputToNewChicoFormatTransformer {
 			AbstractMap.SimpleImmutableEntry<String, Integer> entry = new AbstractMap.SimpleImmutableEntry<String, Integer>(objectId, classVar);
 			objects.add(entry);
 		}
-		DissimMatrix dissimMatrix = new DissimMatrix(n);
+		DissimMatrixDouble dissimMatrix = new DissimMatrixDouble(n);
 		for (int i = 0; i < n; i++) {
 			final String line = buf.readLine();
 			final StringTokenizer strtok = new StringTokenizer(line, ",");
@@ -95,7 +95,7 @@ public class SimpleInputToNewChicoFormatTransformer {
 
 	}
 
-	private static void printDissimMatrix(DissimMatrix dissimMatrix,
+	private static void printDissimMatrix(DissimMatrixDouble dissimMatrix,
 			PrintStream stream) {
 		for (int i = 0; i < dissimMatrix.length(); i++) {
 			stream.print(String.format("%6.6e",dissimMatrix.getDissim(i, 0)));

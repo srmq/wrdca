@@ -26,4 +26,5 @@ public interface ClusterAlgorithm {
 	public List<Cluster> getClusters();
 	public int getIterationsToConverge();
 	public void setMaxIterations(int maxIterations);
+	double[] regretsForElement(int i, List<Cluster> clusters);
 }

@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 import wrdca.algo.WTDHMClustering;
 import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
-import wrdca.util.DissimMatrix;
+import wrdca.util.DissimMatrixDouble;
 
 
 public class WTDHMWine {
@@ -38,20 +38,20 @@ public class WTDHMWine {
 	public static final int APRIORICLASSES = 3;
 
 	public static void main(String[] args) throws IOException, IloException {
-		DissimMatrix tab2 = parseFile(DataFileNames.getString("WineDataset.WINE2"));
-		DissimMatrix tab3 = parseFile(DataFileNames.getString("WineDataset.WINE3"));
-		DissimMatrix tab4 = parseFile(DataFileNames.getString("WineDataset.WINE4"));		
-		DissimMatrix tab5 = parseFile(DataFileNames.getString("WineDataset.WINE5"));
-		DissimMatrix tab6 = parseFile(DataFileNames.getString("WineDataset.WINE6"));
-		DissimMatrix tab7 = parseFile(DataFileNames.getString("WineDataset.WINE7"));
-		DissimMatrix tab8 = parseFile(DataFileNames.getString("WineDataset.WINE8"));
-		DissimMatrix tab9 = parseFile(DataFileNames.getString("WineDataset.WINE9"));
-		DissimMatrix tab10 = parseFile(DataFileNames.getString("WineDataset.WINE10"));
-		DissimMatrix tab11 = parseFile(DataFileNames.getString("WineDataset.WINE11"));
-		DissimMatrix tab12 = parseFile(DataFileNames.getString("WineDataset.WINE12"));
-		DissimMatrix tab13 = parseFile(DataFileNames.getString("WineDataset.WINE13"));
-		DissimMatrix tab14 = parseFile(DataFileNames.getString("WineDataset.WINE14"));
-		List<DissimMatrix> dissimMatrices = new ArrayList<DissimMatrix>(13);
+		DissimMatrixDouble tab2 = parseFile(DataFileNames.getString("WineDataset.WINE2"));
+		DissimMatrixDouble tab3 = parseFile(DataFileNames.getString("WineDataset.WINE3"));
+		DissimMatrixDouble tab4 = parseFile(DataFileNames.getString("WineDataset.WINE4"));		
+		DissimMatrixDouble tab5 = parseFile(DataFileNames.getString("WineDataset.WINE5"));
+		DissimMatrixDouble tab6 = parseFile(DataFileNames.getString("WineDataset.WINE6"));
+		DissimMatrixDouble tab7 = parseFile(DataFileNames.getString("WineDataset.WINE7"));
+		DissimMatrixDouble tab8 = parseFile(DataFileNames.getString("WineDataset.WINE8"));
+		DissimMatrixDouble tab9 = parseFile(DataFileNames.getString("WineDataset.WINE9"));
+		DissimMatrixDouble tab10 = parseFile(DataFileNames.getString("WineDataset.WINE10"));
+		DissimMatrixDouble tab11 = parseFile(DataFileNames.getString("WineDataset.WINE11"));
+		DissimMatrixDouble tab12 = parseFile(DataFileNames.getString("WineDataset.WINE12"));
+		DissimMatrixDouble tab13 = parseFile(DataFileNames.getString("WineDataset.WINE13"));
+		DissimMatrixDouble tab14 = parseFile(DataFileNames.getString("WineDataset.WINE14"));
+		List<DissimMatrixDouble> dissimMatrices = new ArrayList<DissimMatrixDouble>(13);
 		dissimMatrices.add(tab2);		
 		dissimMatrices.add(tab3);
 		dissimMatrices.add(tab4);
@@ -114,10 +114,10 @@ public class WTDHMWine {
 
 	}
 	
-	private static DissimMatrix parseFile(String string) throws IOException {
+	private static DissimMatrixDouble parseFile(String string) throws IOException {
 		File file = new File(string);
 		BufferedReader bufw = new BufferedReader(new FileReader(file));
-		DissimMatrix result = new DissimMatrix(NELEM);
+		DissimMatrixDouble result = new DissimMatrixDouble(NELEM);
 		String line;
 		while((line = bufw.readLine()).indexOf("DIST_MATRIX") == -1)
 			;
