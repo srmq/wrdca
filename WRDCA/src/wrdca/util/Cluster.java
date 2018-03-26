@@ -37,11 +37,11 @@ public class Cluster implements Cloneable {
 		this.elements = elements;
 	}
 	
-	public void remove(int element) {
+	public synchronized void remove(int element) {
 		this.elements.remove(element);
 	}
 	
-	public void add(int element) {
+	public synchronized void add(int element) {
 		this.elements.add(element);
 	}
 	public float[] getWeights() {

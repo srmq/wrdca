@@ -22,6 +22,7 @@ import wrdca.util.Cluster;
 import wrdca.util.ConfusionMatrix;
 import wrdca.util.DissimMatrix;
 import wrdca.util.DissimMatrixDouble;
+import wrdca.util.DissimMatrixFloat;
 import wrdca.util.Pair;
 
 public class WTDHMSimpleFormatRunner {
@@ -33,19 +34,21 @@ public class WTDHMSimpleFormatRunner {
 	private File outputFile;
 	private int n;
 	private int numPrioriClusters;
-	private List<DissimMatrixDouble> dissimMatrices;
+	private List<DissimMatrix> dissimMatrices;
+	private boolean useFloats;
 	
 	
 	private WTDHMSimpleFormatRunner(String[] args) throws FileNotFoundException, IOException {
+		this.useFloats = false;
 		this.readConfigFile(args);
-		this.parseDissimMatrices();
+		this.parseDissimMatrices(this.useFloats);
 	}
 	
 	public ClusterAlgorithm createLocalClusterAlgorithm(List<? extends DissimMatrix> dissimMatrices) {
 		return new WTDHMClustering(dissimMatrices);
 	}
 	
-	public ClusterAlgorithm createGlobalClusterAlgorithm(List<DissimMatrixDouble> dissimMatrices) {
+	public ClusterAlgorithm createGlobalClusterAlgorithm(List<DissimMatrix> dissimMatrices) {
 		return new WTDHMGlobalClustering(dissimMatrices);
 	}
 	
@@ -149,14 +152,14 @@ public class WTDHMSimpleFormatRunner {
 		return new Pair<int[], String[]>(classLabels, names);
 	}
 
-	private void parseDissimMatrices() throws IOException{
-		 this.dissimMatrices = new ArrayList<DissimMatrixDouble>(this.inputFiles.size());
+	private void parseDissimMatrices(boolean useFloats) throws IOException{
+		 this.dissimMatrices = new ArrayList<DissimMatrix>(this.inputFiles.size());
 		 boolean firstFile = true;
 		 Map<String, Integer> refOrder = null;
 		 List<String> refNames = null;
 		 for (File file : inputFiles) {
-			Pair<DissimMatrixDouble, List<String>> parseResult = parseDissimMatrix(file);
-			DissimMatrixDouble dissim = parseResult.getFirst();
+			Pair<DissimMatrix, List<String>> parseResult = parseDissimMatrix(file, useFloats);
+			DissimMatrix dissim = parseResult.getFirst();
 			if (firstFile) {
 				refNames = parseResult.getSecond();
 				refOrder = new HashMap<String, Integer>(refNames.size());
@@ -178,7 +181,7 @@ public class WTDHMSimpleFormatRunner {
 	}
 
 
-	private DissimMatrixDouble reorderedDissim(final Map<String, Integer> refOrder, List<String> second, DissimMatrixDouble dissim) {
+	private DissimMatrixDouble reorderedDissim(final Map<String, Integer> refOrder, List<String> second, DissimMatrix dissim) {
 		List<Pair<String, Integer>> names = new ArrayList<Pair<String, Integer>>(second.size());
 		{
 			int i = 0;
@@ -207,8 +210,8 @@ public class WTDHMSimpleFormatRunner {
 		
 		return dissimMatrix;
 	}
-
-	private Pair<DissimMatrixDouble, List<String>> parseDissimMatrix(File file) throws IOException {
+	
+	private Pair<DissimMatrix, List<String>> parseDissimMatrix(File file, boolean useFloats) throws IOException {
 		BufferedReader buf = new BufferedReader(new FileReader(file));
 		List<String> objNames = new ArrayList<String>(n);
 		for (int i = 0; i < n; i++) {
@@ -216,7 +219,7 @@ public class WTDHMSimpleFormatRunner {
 			line = line.substring(line.indexOf(',')+1);
 			objNames.add(line);
 		}
-		DissimMatrixDouble dissimMatrix = new DissimMatrixDouble(n);
+		DissimMatrix dissimMatrix = useFloats ? new DissimMatrixFloat(n) : new DissimMatrixDouble(n);
 		for (int i = 0; i < n; i++) {
 			final String line = buf.readLine();
 			final StringTokenizer strtok = new StringTokenizer(line, ",");
@@ -226,7 +229,7 @@ public class WTDHMSimpleFormatRunner {
 			}
 		}
 		buf.close();
-		return new Pair<DissimMatrixDouble, List<String>>(dissimMatrix, objNames);
+		return new Pair<DissimMatrix, List<String>>(dissimMatrix, objNames);
 	}
 
 	private void readConfigFile(String[] args)
@@ -252,6 +255,8 @@ public class WTDHMSimpleFormatRunner {
 				n = Integer.parseInt(bufw.readLine());
 			} else if (line.contains("(numPrioriClusters)")) {
 				numPrioriClusters = Integer.parseInt(bufw.readLine());
+			} else if (line.contains("(useDissimFloats)")) {
+				this.useFloats = Integer.parseInt(bufw.readLine()) != 0;
 			}
 		}
 		

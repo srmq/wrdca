@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
@@ -365,8 +366,8 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	}
 
 	private boolean clusterAssign(List<Cluster> clusters) {
-		boolean hasChanged = false;
-		for (int i = 0; i < nElems; i++) {
+		boolean[] hasChanged = {false};
+		IntStream.range(0, nElems).parallel().forEach(i -> {
 			int centerOf;
 			if ((centerOf = isCenterOf(i)) == -1) {
 				int clusterIndexMinDist;
@@ -392,7 +393,9 @@ public class WTDHMClustering implements ClusterAlgorithm {
 					}
 					this.indexInClustersForElem[i] = clusterIndexMinDist;
 					clusters.get(clusterIndexMinDist).add(i);
-					hasChanged = true;
+					synchronized(hasChanged) {
+						hasChanged[0] = true;
+					}
 				}
 			} else {
 				if (this.indexInClustersForElem[i] != centerOf) {
@@ -402,12 +405,13 @@ public class WTDHMClustering implements ClusterAlgorithm {
 
 					this.indexInClustersForElem[i] = centerOf;
 					clusters.get(centerOf).add(i);
-
-					hasChanged = true;
+					synchronized(hasChanged) {
+						hasChanged[0] = true;
+					}
 				}
 			}
-		}
-		return hasChanged;
+		});
+		return hasChanged[0];
 	}
 
 	private final double maxRegret(int i, int j, Cluster cluster) {
@@ -441,26 +445,27 @@ public class WTDHMClustering implements ClusterAlgorithm {
 	}
 	
 	private List<Cluster> bestPrototypes() {
-		//List<Cluster> clusterList = genClusters();
-		float[] minSumRegrets = new float[this.clusters.size()];
+		Float[] minSumRegrets = new Float[this.clusters.size()];
 		for (int k = 0; k < minSumRegrets.length; k++) {
 			if (clusters.get(k).getCenter() >= 0) {
 				minSumRegrets[k] = calcRegret(clusters.get(k).getCenter(), clusters.get(k), BIG_CONSTANT);
 			} else {
-				minSumRegrets[k] = BIG_CONSTANT;
+				minSumRegrets[k] = (float) BIG_CONSTANT;
 			}
 		}
 		
-		for (int n = 0; n < nElems; n++) {
+		IntStream.range(0, nElems).parallel().forEach(n -> {
 			// para cada elemento ver se ele e melhor do que o que temos agora
 			for (int k = 0; k < this.clusters.size(); k++) {
 				final float regret = calcRegret(n, clusters.get(k), minSumRegrets[k]);
-				if ((regret + EPSILON) < minSumRegrets[k]) {
-					clusters.get(k).setCenter(n);
-					minSumRegrets[k] = regret;
+				synchronized(minSumRegrets[k]) {
+					if ((regret + EPSILON) < minSumRegrets[k]) {
+						clusters.get(k).setCenter(n);
+						minSumRegrets[k] = regret;
+					}
 				}
 			}
-		}
+		});
 //		for (int i = 0; i < protIndices.length; i++) {
 //			protIndices[i] = clusters.get(i).getCenter();
 //		}

@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import ilog.concert.IloException;
 import ilog.concert.IloIntVar;
@@ -48,7 +49,7 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	
 	private static final Random rnd = new Random(1);
 	
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	
 	public static final double EPSILON = 0.000001;
@@ -262,19 +263,21 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	
 	
 	private List<Cluster> bestPrototypes() {
-		float[] minSumRegrets = new float[this.clusters.size()];
+		Float[] minSumRegrets = new Float[this.clusters.size()];
 		Arrays.fill(minSumRegrets, BIG_CONSTANT);
 		
-		for (int n = 0; n < nElems; n++) {
+		IntStream.range(0, nElems).parallel().forEach(n -> {
 			// para cada elemento ver se ele e melhor do que o que temos agora
 			for (int k = 0; k < this.clusters.size(); k++) {
 				final float regret = calcRegret(n, clusters.get(k), minSumRegrets[k]);
-				if ((regret + EPSILON) < minSumRegrets[k]) {
-					clusters.get(k).setCenter(n);
-					minSumRegrets[k] = regret;
+				synchronized(minSumRegrets[k]) {
+					if ((regret + EPSILON) < minSumRegrets[k]) {
+						clusters.get(k).setCenter(n);
+						minSumRegrets[k] = regret;
+					}
 				}
 			}
-		}
+		});
 		return clusters;
 	}
 	
@@ -370,8 +373,8 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	
 	
 	private boolean clusterAssign(List<Cluster> clusters) {
-		boolean hasChanged = false;
-		for (int i = 0; i < nElems; i++) {
+		boolean[] hasChanged = {false};
+		IntStream.range(0, nElems).parallel().forEach(i -> {
 			int centerOf;
 			if ((centerOf = isCenterOf(i)) == -1) {
 				int clusterIndexMinDist = -1;
@@ -390,7 +393,9 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 					}
 					this.indexInClustersForElem[i] = clusterIndexMinDist;
 					clusters.get(clusterIndexMinDist).add(i);
-					hasChanged = true;
+					synchronized(hasChanged) {
+						hasChanged[0] = true;
+					}
 				}
 			} else {
 				if (this.indexInClustersForElem[i] != centerOf) {
@@ -400,12 +405,13 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 
 					this.indexInClustersForElem[i] = centerOf;
 					clusters.get(centerOf).add(i);
-
-					hasChanged = true;
+					synchronized (hasChanged) {
+						hasChanged[0] = true;						
+					}
 				}
 			}
-		}
-		return hasChanged;
+		});
+		return hasChanged[0];
 	}
 	
 
