@@ -264,7 +264,7 @@ public class WTDHMGlobalClustering implements ClusterAlgorithm {
 	
 	private List<Cluster> bestPrototypes() {
 		Float[] minSumRegrets = new Float[this.clusters.size()];
-		Arrays.fill(minSumRegrets, BIG_CONSTANT);
+		Arrays.fill(minSumRegrets, new Float(BIG_CONSTANT));
 		
 		IntStream.range(0, nElems).parallel().forEach(n -> {
 			// para cada elemento ver se ele e melhor do que o que temos agora

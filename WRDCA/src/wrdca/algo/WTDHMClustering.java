@@ -34,7 +34,7 @@ import wrdca.util.DissimMatrix;
 
 public class WTDHMClustering implements ClusterAlgorithm {
 	private List<? extends DissimMatrix> dissimMatrices;
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	private static final Random rnd = new Random(1);
 	
 	public static final double EPSILON = 0.000001;
