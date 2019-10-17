@@ -1,25 +1,80 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>br.ufpe.cin.cluster</groupId>
-  <artifactId>srmq-wrdca</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>br.ufpe.cin.cluster</groupId>
+	<artifactId>srmq-wrdca</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>wrdca</name>
+	<url>https://github.com/srmq/wrdca</url>
+	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- run maven with "-Dcplex.jar=<other_path> to override default value -->
+		<cplex.jar>/opt/IBM/ILOG/CPLEX_Studio125/cplex/lib/cplex.jar</cplex.jar>
 	</properties>
-  
-  
-  <build>
-    <sourceDirectory>src</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <plugins>
+
+	<licenses>
+		<license>
+			<name>GNU General Public License, Version 3 or later</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+			<distribution>manual</distribution>
+			<comments>A free, strong copyleft license for software and other kinds of works</comments>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<email>srmq@cin.ufpe.br</email>
+			<name>Sergio Queiroz</name>
+			<url>https://github.com/srmq</url>
+			<id>srmq</id>
+		</developer>
+	</developers>
+
+	<repositories>
+		<repository>
+			<releases>
+				<enabled>false</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+			<id>srmq-maven-repo</id>
+			<name>SRMQ's development repository</name>
+			<url>https://srmq-maven-repo.appspot.com</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>srmq-maven-repo</id>
+			<name>SRMQ's development repository</name>
+			<url>https://srmq-maven-repo.appspot.com</url>
+			<layout>default</layout>
+		</snapshotRepository>
+	</distributionManagement>
+
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -29,15 +84,15 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-    </plugins>
-  </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>opt.ibm.ilog</groupId>
-  		<artifactId>cplex</artifactId>
-  		<version>12.5</version>
-  		<scope>system</scope>
-  		<systemPath>/opt/IBM/ILOG/CPLEX_Studio125/cplex/lib/cplex.jar</systemPath>
-  	</dependency>
-  </dependencies>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>opt.ibm.ilog</groupId>
+			<artifactId>cplex</artifactId>
+			<version>12.5</version>
+			<scope>system</scope>
+			<systemPath>${cplex.jar}</systemPath>
+		</dependency>
+	</dependencies>
 </project>
